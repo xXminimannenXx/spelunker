@@ -37,11 +37,11 @@ chmod +x spelunker-linux-x86_64
 
 ### Running it from anywhere
 
-To use the command without typing the full path, move the binary into a folder that is on your `PATH` — for example `~/.local/bin` on Linux — and rename it to `spelunker`.
+To use the command without typing the full path, move the binary into a folder that is on your `PATH` — for example `~/.local/bin` on Linux — and rename it to `spelunker`. 
 
 ## Usage
 
-spelunker <path>
+spelunker path
 
 
 The path is the directory where the search starts. Spelunker searches recursively and stops descending once it finds a Unity project.
