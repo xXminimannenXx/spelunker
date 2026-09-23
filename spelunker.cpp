@@ -55,8 +55,8 @@ bool isUnityProj(const fs::path &dir)
 
 void findUnityLibs(const fs::path &dir, std::vector<sizedPath> &allPaths)
 {
-
-    for (auto const &d : fs::directory_iterator{dir, fs::directory_options::skip_permission_denied})
+    std::error_code er;
+    for (auto const &d : fs::directory_iterator{dir, fs::directory_options::skip_permission_denied, er})
     {
         if (!fs::is_symlink(d) && fs::is_directory(d))
         {
@@ -103,8 +103,8 @@ uintmax_t getDirSize(const fs::path &dir)
     {
         return 0;
     }
-
-    for (auto const &f : fs::recursive_directory_iterator{dir, fs::directory_options::skip_permission_denied})
+      std::error_code er;
+    for (auto const &f : fs::recursive_directory_iterator{dir, fs::directory_options::skip_permission_denied, er})
     {
 
         if (fs::is_regular_file(f))
