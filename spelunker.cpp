@@ -56,10 +56,11 @@ bool isUnityProj(const fs::path &dir)
 void findUnityLibs(const fs::path &dir, std::vector<sizedPath> &allPaths)
 {
     std::error_code er;
+    uintmax_t counter = 0;
     for (auto const &d : fs::directory_iterator{dir, fs::directory_options::skip_permission_denied, er})
     {
 
-        std::cout << "Searching in  " << d.path().filename() << " - " << allPaths.size() << " projects found\r" << std::flush;
+        std::cout << "searched:  " << counter << " - " << allPaths.size() << " projects found\r" << std::flush;
         if (!fs::is_symlink(d) && fs::is_directory(d))
         {
 
@@ -72,6 +73,7 @@ void findUnityLibs(const fs::path &dir, std::vector<sizedPath> &allPaths)
                 findUnityLibs(d, allPaths);
             }
         }
+        counter++;
     }
 }
 
