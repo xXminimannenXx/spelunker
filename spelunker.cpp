@@ -31,7 +31,7 @@ int main(int argc, char *argv[])
 {
 
     std::vector<sizedPath> allPaths = {};
-  
+
     if (!argCheck(argc, argv))
     {
         return EXIT_FAILURE;
@@ -58,6 +58,8 @@ void findUnityLibs(const fs::path &dir, std::vector<sizedPath> &allPaths)
     std::error_code er;
     for (auto const &d : fs::directory_iterator{dir, fs::directory_options::skip_permission_denied, er})
     {
+
+        std::cout << "Searching in  " << d.path().filename() << " - " << allPaths.size() << " projects found\r" << std::flush;
         if (!fs::is_symlink(d) && fs::is_directory(d))
         {
 
@@ -103,7 +105,7 @@ uintmax_t getDirSize(const fs::path &dir)
     {
         return 0;
     }
-      std::error_code er;
+    std::error_code er;
     for (auto const &f : fs::recursive_directory_iterator{dir, fs::directory_options::skip_permission_denied, er})
     {
 
@@ -115,14 +117,15 @@ uintmax_t getDirSize(const fs::path &dir)
     return size;
 }
 
-void printVector(const std::vector<sizedPath> &paths){
-    
-    for(auto const &e : paths){
-        auto timeDiff = fs::file_time_type::clock::now() -  e.lastOpened; 
-        auto dagar = (std::chrono::duration_cast<std::chrono::hours>(timeDiff))/24;
-        std::cout << "Path: " << e.Path << " size: " <<  shortSize(e.size) << " last written: " << dagar.count() << " days ago\n" ;
-    }
+void printVector(const std::vector<sizedPath> &paths)
+{
 
+    for (auto const &e : paths)
+    {
+        auto timeDiff = fs::file_time_type::clock::now() - e.lastOpened;
+        auto dagar = (std::chrono::duration_cast<std::chrono::hours>(timeDiff)) / 24;
+        std::cout << "Path: " << e.Path << " size: " << shortSize(e.size) << " last written: " << dagar.count() << " days ago\n";
+    }
 }
 std::string shortSize(uintmax_t size)
 {
