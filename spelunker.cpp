@@ -18,7 +18,7 @@ struct sizedPath
 
 //--[MethodDeclaration]--
 uintmax_t getDirSize(const fs::path &dir);
-void findUnityLibs(const fs::path &dir, std::vector<sizedPath> &allPaths);
+void findUnityLibs(const fs::path &dir, std::vector<sizedPath> &allPaths, uintmax_t &counter);
 void asciiArt();
 std::string shortSize(uintmax_t size);
 bool argCheck(int argc, char *argv[]);
@@ -31,13 +31,13 @@ int main(int argc, char *argv[])
 {
 
     std::vector<sizedPath> allPaths = {};
-
+    uintmax_t counter = 0;
     if (!argCheck(argc, argv))
     {
         return EXIT_FAILURE;
     }
     asciiArt();
-    findUnityLibs(argv[1], allPaths);
+    findUnityLibs(argv[1], allPaths, counter);
     printVector(allPaths);
 
     return EXIT_SUCCESS;
@@ -53,10 +53,10 @@ bool isUnityProj(const fs::path &dir)
     return false;
 }
 
-void findUnityLibs(const fs::path &dir, std::vector<sizedPath> &allPaths)
+void findUnityLibs(const fs::path &dir, std::vector<sizedPath> &allPaths, uintmax_t &counter)
 {
     std::error_code er;
-    uintmax_t counter = 0;
+ 
     for (auto const &d : fs::directory_iterator{dir, fs::directory_options::skip_permission_denied, er})
     {
 
@@ -70,7 +70,7 @@ void findUnityLibs(const fs::path &dir, std::vector<sizedPath> &allPaths)
             }
             else
             {
-                findUnityLibs(d, allPaths);
+                findUnityLibs(d, allPaths, counter);
             }
         }
         counter++;
