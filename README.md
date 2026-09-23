@@ -9,7 +9,7 @@ Spelunker is a tool used to find Unity Library folders, making it easier to find
 $ spelunker D:\Projects
 
 Path: "D:\Projects\OldPrototype" size: 4.2 GiB last written: 312 days ago
-Path: "D:\Projects\TowerDefense" size: 8.7 GiB last written: 2 days ago
+
 
 
 ## Download
