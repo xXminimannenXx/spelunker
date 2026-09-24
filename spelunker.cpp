@@ -54,6 +54,7 @@ int main(int argc, char *argv[])
     asciiArt();
     findUnityLibs(argv[1], allPaths, counter);
     addSizeToDirs(allPaths);
+    std::sort(allPaths.begin(), allPaths.end(), [](const sizedPath &a, const sizedPath &b) { return a.size > b.size; });
     printVector(allPaths);
 
     return EXIT_SUCCESS;
@@ -159,12 +160,13 @@ void addSizeToDirs(std::vector<sizedPath> &path)
 
 void printVector(const std::vector<sizedPath> &paths)
 {
-
+    int counter = 1;
     for (auto const &e : paths)
     {
         auto timeDiff = fs::file_time_type::clock::now() - e.lastOpened;
         auto dagar = (std::chrono::duration_cast<std::chrono::hours>(timeDiff)) / 24;
-        std::cout << "Path: " << e.Path << " size: " << shortSize(e.size) << " last written: " << dagar.count() << " days ago\n";
+        std::cout << "[" << counter << "]: Path: " << e.Path << " size: " << shortSize(e.size) << " last written: " << dagar.count() << " days ago\n";
+        counter++;
     }
 }
 std::string shortSize(uintmax_t size)
