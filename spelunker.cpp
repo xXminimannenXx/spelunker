@@ -76,6 +76,7 @@ int main(int argc, char *argv[])
 }
 std::vector<int> getNumsToDelete(const std::vector<sizedPath> &path)
 {
+    std::cout << "enter the [number] for each library to be deleted\n";
     std::vector<int> entriesToDelete;
     std::string nums;
     std::getline(std::cin, nums);
@@ -96,7 +97,7 @@ std::vector<int> getNumsToDelete(const std::vector<sizedPath> &path)
 }
 bool isValidEntry(int num, const std::vector<sizedPath> &path){
 
-    if(num >= 0 && num < path.size()){
+    if(num >= 0 && num < static_cast<int>(path.size())){
         return true;
     }
     return false;
@@ -115,7 +116,7 @@ void deleteEntries(const std::vector<int> &entries, const std::vector<sizedPath>
 
     std::cout << "test:" << std::endl;
     for(const auto &i : entries){
-        std::cout << i << " was deleted";
+        std::cout << path[i].Path.string() << " was deleted";
     }
 
 }
