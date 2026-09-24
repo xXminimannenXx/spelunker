@@ -30,6 +30,10 @@ std::string shortSize(uintmax_t size);
 void printVector(const std::vector<sizedPath> &paths);
 std::string toLower(const std::string &s);
 void addSizeToDirs(std::vector<sizedPath> &paths);
+std::vector<int> getNumsToDelete(const std::vector<sizedPath> &path);
+bool isValidEntry(int num, const std::vector<sizedPath> &path);
+bool confirmationFromUser();
+void deleteEntries(const std::vector<int> &entries, const std::vector<sizedPath> &path);
 
 //--[globalVars]--
 const std::vector<std::string> skipDirs = {
@@ -44,22 +48,77 @@ const std::vector<std::string> skipDirs = {
 //--[real stuff]--
 int main(int argc, char *argv[])
 {
-
+    //--[preSearch]--
     std::vector<sizedPath> allPaths = {};
     uintmax_t counter = 0;
     if (!argCheck(argc, argv))
     {
         return EXIT_FAILURE;
     }
+    
     asciiArt();
+    //--[Search]--
     findUnityLibs(argv[1], allPaths, counter);
     addSizeToDirs(allPaths);
-    std::sort(allPaths.begin(), allPaths.end(), [](const sizedPath &a, const sizedPath &b) { return a.size > b.size; });
+    std::sort(allPaths.begin(), allPaths.end(), [](const sizedPath &a, const sizedPath &b)
+              { return a.size > b.size; });
+    //--[searchResult]--
     printVector(allPaths);
-
+    //--[userInteraction]--
+    std::vector<int> numsToDel = getNumsToDelete(allPaths);
+    if(confirmationFromUser()){
+        deleteEntries(numsToDel, allPaths);
+    }
+    else{
+        std::cout << "operation was cancelled" << std::endl;
+    } 
     return EXIT_SUCCESS;
 }
+std::vector<int> getNumsToDelete(const std::vector<sizedPath> &path)
+{
+    std::vector<int> entriesToDelete;
+    std::string nums;
+    std::getline(std::cin, nums);
+    int num = 0;
+    std::istringstream stream(nums);
+    while (stream >> num)
+    {
+        if (isValidEntry(num-1, path))
+        {
 
+            entriesToDelete.push_back(num-1);
+        }
+        else{
+            std::cout << num << " is not a valid entry, was skipped" << std::endl;
+        }
+    }
+    return entriesToDelete;
+}
+bool isValidEntry(int num, const std::vector<sizedPath> &path){
+
+    if(num >= 0 && num < path.size()){
+        return true;
+    }
+    return false;
+
+}
+bool confirmationFromUser(){
+    std::cout << "Are you sure you want to delete these? [y/N]\n[type Y to confirm]\n";
+     std::string answer;
+    std::getline(std::cin, answer);
+    if(answer == "Y"){
+        return true;
+    }
+    return false;
+}
+void deleteEntries(const std::vector<int> &entries, const std::vector<sizedPath> &path){
+
+    std::cout << "test:" << std::endl;
+    for(const auto &i : entries){
+        std::cout << i << " was deleted";
+    }
+
+}
 bool isUnityProj(const fs::path &dir)
 {
 
@@ -77,8 +136,9 @@ void findUnityLibs(const fs::path &dir, std::vector<sizedPath> &allPaths, uintma
     for (auto const &d : fs::directory_iterator{dir, fs::directory_options::skip_permission_denied, er})
     {
 
-        if(counter % 1000 == 0){
-        std::cout << "searched:  " << counter << " - " << allPaths.size() << " projects found\r" << std::flush;
+        if (counter % 1000 == 0)
+        {
+            std::cout << "searched:  " << counter << " - " << allPaths.size() << " projects found\r" << std::flush;
         }
         if (std::find(skipDirs.begin(), skipDirs.end(), toLower(d.path().filename().string())) != skipDirs.end())
         {
@@ -91,7 +151,7 @@ void findUnityLibs(const fs::path &dir, std::vector<sizedPath> &allPaths, uintma
             {
 
                 allPaths.push_back({d, 0, fs::last_write_time(d.path() / "Assets")});
-                   std::cout << "searched:  " << counter << " - " << allPaths.size() << " projects found\r" << std::flush;
+                std::cout << "searched:  " << counter << " - " << allPaths.size() << " projects found\r" << std::flush;
             }
             else
             {
@@ -165,10 +225,11 @@ void printVector(const std::vector<sizedPath> &paths)
     {
         auto timeDiff = fs::file_time_type::clock::now() - e.lastOpened;
         auto dagar = (std::chrono::duration_cast<std::chrono::hours>(timeDiff)) / 24;
-        std::cout << "[" << counter << "]: size: " << shortSize(e.size) << " | Last written: " << dagar.count() << " days ago"  << " | Path: " << e.Path.string() << std::endl;
+        std::cout << "[" << counter << "]: size: " << shortSize(e.size) << " | Last written: " << dagar.count() << " days ago" << " | Path: " << e.Path.string() << std::endl;
         counter++;
     }
 }
+
 std::string shortSize(uintmax_t size)
 {
 
