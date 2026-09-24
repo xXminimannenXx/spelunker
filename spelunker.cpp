@@ -53,6 +53,7 @@ int main(int argc, char *argv[])
     }
     asciiArt();
     findUnityLibs(argv[1], allPaths, counter);
+    addSizeToDirs(allPaths);
     printVector(allPaths);
 
     return EXIT_SUCCESS;
@@ -75,7 +76,9 @@ void findUnityLibs(const fs::path &dir, std::vector<sizedPath> &allPaths, uintma
     for (auto const &d : fs::directory_iterator{dir, fs::directory_options::skip_permission_denied, er})
     {
 
+        if(counter % 1000 == 0){
         std::cout << "searched:  " << counter << " - " << allPaths.size() << " projects found\r" << std::flush;
+        }
         if (std::find(skipDirs.begin(), skipDirs.end(), toLower(d.path().filename().string())) != skipDirs.end())
         {
             continue;
@@ -87,6 +90,7 @@ void findUnityLibs(const fs::path &dir, std::vector<sizedPath> &allPaths, uintma
             {
 
                 allPaths.push_back({d, 0, fs::last_write_time(d.path() / "Assets")});
+                   std::cout << "searched:  " << counter << " - " << allPaths.size() << " projects found\r" << std::flush;
             }
             else
             {
@@ -139,7 +143,7 @@ uintmax_t getDirSize(const fs::path &dir)
     return size;
 }
 
-void addSizeToDir(std::vector<sizedPath> &path)
+void addSizeToDirs(std::vector<sizedPath> &path)
 {
 
     std::vector<std::future<uintmax_t>> tempVector;
