@@ -55,7 +55,7 @@ int main(int argc, char *argv[])
     {
         return EXIT_FAILURE;
     }
-    
+
     asciiArt();
     //--[Search]--
     findUnityLibs(argv[1], allPaths, counter);
@@ -66,12 +66,14 @@ int main(int argc, char *argv[])
     printVector(allPaths);
     //--[userInteraction]--
     std::vector<int> numsToDel = getNumsToDelete(allPaths);
-    if(confirmationFromUser()){
+    if (confirmationFromUser())
+    {
         deleteEntries(numsToDel, allPaths);
     }
-    else{
+    else
+    {
         std::cout << "operation was cancelled" << std::endl;
-    } 
+    }
     return EXIT_SUCCESS;
 }
 std::vector<int> getNumsToDelete(const std::vector<sizedPath> &path)
@@ -84,42 +86,61 @@ std::vector<int> getNumsToDelete(const std::vector<sizedPath> &path)
     std::istringstream stream(nums);
     while (stream >> num)
     {
-        if (isValidEntry(num-1, path))
+        if (isValidEntry(num - 1, path))
         {
 
-            entriesToDelete.push_back(num-1);
+            entriesToDelete.push_back(num - 1);
         }
-        else{
+        else
+        {
             std::cout << num << " is not a valid entry, was skipped" << std::endl;
         }
     }
     return entriesToDelete;
 }
-bool isValidEntry(int num, const std::vector<sizedPath> &path){
+bool isValidEntry(int num, const std::vector<sizedPath> &path)
+{
 
-    if(num >= 0 && num < static_cast<int>(path.size())){
+    if (num >= 0 && num < static_cast<int>(path.size()))
+    {
         return true;
     }
     return false;
-
 }
-bool confirmationFromUser(){
+bool confirmationFromUser()
+{
     std::cout << "Are you sure you want to delete these? [y/N]\n";
-     std::string answer;
+    std::string answer;
     std::getline(std::cin, answer);
-    if(answer == "Y" || answer == "y"){
+    if (answer == "Y" || answer == "y")
+    {
         return true;
     }
     return false;
 }
-void deleteEntries(const std::vector<int> &entries, const std::vector<sizedPath> &path){
+void deleteEntries(const std::vector<int> &entries, const std::vector<sizedPath> &path)
+{
 
-    std::cout << "test:" << std::endl;
-    for(const auto &i : entries){
-        std::cout << path[i].Path.string() << " was deleted\n";
+   
+    for (const auto &i : entries)
+    {
+        fs::path lib = path[i].Path / "Library";
+        if (lib.filename() == "Library")
+        {
+            std::error_code ec;
+            fs::remove_all(lib, ec);
+            if (ec)
+            {
+                std::cout << ec.message() << std::endl;
+            }
+            else
+            {
+                std::cout << lib.string() << " was deleted\n";
+            }
+        }
     }
-
 }
+
 bool isUnityProj(const fs::path &dir)
 {
 
