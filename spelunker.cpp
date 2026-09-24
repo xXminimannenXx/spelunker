@@ -116,7 +116,7 @@ void deleteEntries(const std::vector<int> &entries, const std::vector<sizedPath>
 
     std::cout << "test:" << std::endl;
     for(const auto &i : entries){
-        std::cout << path[i].Path.string() << " was deleted";
+        std::cout << path[i].Path.string() << " was deleted\n";
     }
 
 }
