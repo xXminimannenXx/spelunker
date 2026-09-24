@@ -83,7 +83,8 @@ void findUnityLibs(const fs::path &dir, std::vector<sizedPath> &allPaths, uintma
 
             if (isUnityProj(d))
             {
-                allPaths.push_back({d, getDirSize(d.path() / "Library"), fs::last_write_time(d.path() / "Assets")});
+                 // sätt tillbaka under efetr test: getDirSize(d.path() / "Library")
+                allPaths.push_back({d,0, fs::last_write_time(d.path() / "Assets")});
             }
             else
             {
@@ -120,7 +121,7 @@ uintmax_t getDirSize(const fs::path &dir)
     {
         return fs::file_size(dir);
     }
-    if (!fs::is_directory(dir))
+    if (!fs::is_directory(dir)) 
     {
         return 0;
     }
@@ -128,9 +129,9 @@ uintmax_t getDirSize(const fs::path &dir)
     for (auto const &f : fs::recursive_directory_iterator{dir, fs::directory_options::skip_permission_denied, er})
     {
 
-        if (fs::is_regular_file(f))
+        if (f.is_regular_file())
         {
-            size += fs::file_size(f);
+            size += f.file_size();
         }
     }
     return size;
