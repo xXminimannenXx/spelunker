@@ -7,6 +7,7 @@
 #include <chrono>
 #include <cctype>
 #include <algorithm>
+#include <future>
 //--[NameSpaces]--
 namespace fs = std::filesystem;
 
@@ -28,6 +29,7 @@ bool isUnityProj(const fs::path &dir);
 std::string shortSize(uintmax_t size);
 void printVector(const std::vector<sizedPath> &paths);
 std::string toLower(const std::string &s);
+void addSizeToDirs(std::vector<sizedPath> &paths);
 
 //--[globalVars]--
 const std::vector<std::string> skipDirs = {
@@ -38,8 +40,7 @@ const std::vector<std::string> skipDirs = {
     "origin games", "gog games",
     "node_modules", ".git", ".svn", "venv", ".venv",
     "__pycache__", ".gradle", ".nuget", "vendor",
-    "obj"
-};
+    "obj"};
 //--[real stuff]--
 int main(int argc, char *argv[])
 {
@@ -75,7 +76,8 @@ void findUnityLibs(const fs::path &dir, std::vector<sizedPath> &allPaths, uintma
     {
 
         std::cout << "searched:  " << counter << " - " << allPaths.size() << " projects found\r" << std::flush;
-        if(std::find(skipDirs.begin(), skipDirs.end(), toLower(d.path().filename().string())) != skipDirs.end()){
+        if (std::find(skipDirs.begin(), skipDirs.end(), toLower(d.path().filename().string())) != skipDirs.end())
+        {
             continue;
         }
         if (!d.is_symlink() && d.is_directory())
@@ -83,8 +85,8 @@ void findUnityLibs(const fs::path &dir, std::vector<sizedPath> &allPaths, uintma
 
             if (isUnityProj(d))
             {
-                 // sätt tillbaka under efetr test: getDirSize(d.path() / "Library")
-                allPaths.push_back({d,0, fs::last_write_time(d.path() / "Assets")});
+
+                allPaths.push_back({d, 0, fs::last_write_time(d.path() / "Assets")});
             }
             else
             {
@@ -121,7 +123,7 @@ uintmax_t getDirSize(const fs::path &dir)
     {
         return fs::file_size(dir);
     }
-    if (!fs::is_directory(dir)) 
+    if (!fs::is_directory(dir))
     {
         return 0;
     }
@@ -135,6 +137,20 @@ uintmax_t getDirSize(const fs::path &dir)
         }
     }
     return size;
+}
+
+void addSizeToDir(std::vector<sizedPath> &path)
+{
+
+    std::vector<std::future<uintmax_t>> tempVector;
+    for (auto &p : path)
+    {
+        tempVector.push_back(std::async(std::launch::async, getDirSize, p.Path / "Library"));
+    }
+    for (std::size_t i = 0; i < tempVector.size(); i++)
+    {
+        path[i].size = tempVector[i].get();
+    }
 }
 
 void printVector(const std::vector<sizedPath> &paths)
