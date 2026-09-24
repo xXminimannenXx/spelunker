@@ -5,6 +5,8 @@
 #include <vector>
 #include <sstream>
 #include <chrono>
+#include <cctype>
+#include <algorithm>
 //--[NameSpaces]--
 namespace fs = std::filesystem;
 
@@ -25,7 +27,19 @@ bool argCheck(int argc, char *argv[]);
 bool isUnityProj(const fs::path &dir);
 std::string shortSize(uintmax_t size);
 void printVector(const std::vector<sizedPath> &paths);
+std::string toLower(const std::string &s);
 
+//--[globalVars]--
+const std::vector<std::string> skipDirs = {
+    "$recycle.bin", "system volume information", "windows",
+    "program files", "program files (x86)", "programdata",
+    "$winreagent", "recovery",
+    "steamapps", "steam", "epicgames", "battle.net",
+    "origin games", "gog games",
+    "node_modules", ".git", ".svn", "venv", ".venv",
+    "__pycache__", ".gradle", ".nuget", "vendor",
+    "obj"
+};
 //--[real stuff]--
 int main(int argc, char *argv[])
 {
@@ -56,12 +70,15 @@ bool isUnityProj(const fs::path &dir)
 void findUnityLibs(const fs::path &dir, std::vector<sizedPath> &allPaths, uintmax_t &counter)
 {
     std::error_code er;
- 
+
     for (auto const &d : fs::directory_iterator{dir, fs::directory_options::skip_permission_denied, er})
     {
 
         std::cout << "searched:  " << counter << " - " << allPaths.size() << " projects found\r" << std::flush;
-        if (!fs::is_symlink(d) && fs::is_directory(d))
+        if(std::find(skipDirs.begin(), skipDirs.end(), toLower(d.path().filename().string())) != skipDirs.end()){
+            continue;
+        }
+        if (!d.is_symlink() && d.is_directory())
         {
 
             if (isUnityProj(d))
@@ -145,6 +162,15 @@ std::string shortSize(uintmax_t size)
     std::ostringstream stream;
     stream << std::fixed << std::setprecision(1) << d;
     return stream.str() + " " + sizes[c];
+}
+std::string toLower(const std::string &s)
+{
+    std::string out = s;
+    for (char &c : out)
+    {
+        c = static_cast<char>(std::tolower(static_cast<unsigned char>(c)));
+    }
+    return out;
 }
 void asciiArt()
 {

@@ -41,7 +41,7 @@ To use the command without typing the full path, move the binary into a folder t
 
 ## Usage
 
-spelunker path
+spelunker  path
 
 
 The path is the directory where the search starts. Spelunker searches recursively and stops descending once it finds a Unity project.
