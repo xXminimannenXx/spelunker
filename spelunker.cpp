@@ -165,7 +165,7 @@ void printVector(const std::vector<sizedPath> &paths)
     {
         auto timeDiff = fs::file_time_type::clock::now() - e.lastOpened;
         auto dagar = (std::chrono::duration_cast<std::chrono::hours>(timeDiff)) / 24;
-        std::cout << "[" << counter << "]: Path: " << e.Path << " size: " << shortSize(e.size) << " last written: " << dagar.count() << " days ago\n";
+        std::cout << "[" << counter << "]: size: " << shortSize(e.size) << " last written: " << dagar.count() << " days ago"  << " Path: " << e.Path.string() << std::endl;
         counter++;
     }
 }
