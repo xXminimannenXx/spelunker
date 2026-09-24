@@ -103,10 +103,10 @@ bool isValidEntry(int num, const std::vector<sizedPath> &path){
 
 }
 bool confirmationFromUser(){
-    std::cout << "Are you sure you want to delete these? [y/N]\n[type Y to confirm]\n";
+    std::cout << "Are you sure you want to delete these? [y/N]\n";
      std::string answer;
     std::getline(std::cin, answer);
-    if(answer == "Y"){
+    if(answer == "Y" || answer == "y"){
         return true;
     }
     return false;
