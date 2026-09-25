@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.15)
-project(spelunker VERSION 0.1.0 LANGUAGES CXX)
+project(spelunker VERSION 0.3.0 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -9,7 +9,7 @@ if(MSVC)
     set_property(TARGET spelunker PROPERTY
         MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 else()
-    target_link_options(spelunker PRIVATE -static-libstdc++ -static-libgcc)
+    target_link_options(spelunker PRIVATE -static)
 endif()
 if(MSVC)
     target_compile_options(spelunker PRIVATE /W4)
