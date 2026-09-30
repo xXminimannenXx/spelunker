@@ -32,8 +32,8 @@ std::string toLower(const std::string &s);
 void addSizeToDirs(std::vector<sizedPath> &paths);
 std::vector<int> getNumsToDelete(const std::vector<sizedPath> &path);
 bool isValidEntry(int num, const std::vector<sizedPath> &path);
-bool confirmationFromUser();
-void deleteEntries(const std::vector<int> &entries, const std::vector<sizedPath> &path);
+bool confirmationFromUser(const std::string &msg, bool yesIsDefault);
+void deleteEntries(const std::vector<int> &entries,  std::vector<sizedPath> &path);
 
 //--[globalVars]--
 const std::vector<std::string> skipDirs = {
@@ -63,17 +63,21 @@ int main(int argc, char *argv[])
     std::sort(allPaths.begin(), allPaths.end(), [](const sizedPath &a, const sizedPath &b)
               { return a.size > b.size; });
     //--[searchResult]--
-    printVector(allPaths);
+
     //--[userInteraction]--
-    std::vector<int> numsToDel = getNumsToDelete(allPaths);
-    if (confirmationFromUser())
+    do
     {
-        deleteEntries(numsToDel, allPaths);
-    }
-    else
-    {
-        std::cout << "operation was cancelled" << std::endl;
-    }
+        printVector(allPaths);
+        std::vector<int> numsToDel = getNumsToDelete(allPaths);
+        if (confirmationFromUser("Are you sure you want to delete these?", false))
+        {
+            deleteEntries(numsToDel, allPaths);
+        }
+        else
+        {
+            std::cout << "operation was cancelled" << std::endl;
+        }
+    } while (confirmationFromUser("Do you want to continue?", false));
     return EXIT_SUCCESS;
 }
 std::vector<int> getNumsToDelete(const std::vector<sizedPath> &path)
@@ -107,35 +111,51 @@ bool isValidEntry(int num, const std::vector<sizedPath> &path)
     }
     return false;
 }
-bool confirmationFromUser()
+bool confirmationFromUser(const std::string &msg, bool yesIsDefault)
 {
-    std::cout << "Are you sure you want to delete these? [y/N]\n";
+
+    std::cout << msg << (yesIsDefault ? " [Y/n]" : " [y/N]") << std::endl;
     std::string answer;
     std::getline(std::cin, answer);
-    if (answer == "Y" || answer == "y")
+    if (!yesIsDefault)
     {
-        return true;
+        if (answer == "Y" || answer == "y")
+        {
+            return true;
+        }
+    }
+    else
+    {
+        if (answer == "N" || answer == "n")
+        {
+            return false;
+        }
+        else
+        {
+            return true;
+        }
     }
     return false;
 }
-void deleteEntries(const std::vector<int> &entries, const std::vector<sizedPath> &path)
+void deleteEntries(const std::vector<int> &entries, std::vector<sizedPath> &path)
 {
 
-   
     for (const auto &i : entries)
     {
         fs::path lib = path[i].Path / "Library";
         if (lib.filename() == "Library")
         {
             std::error_code ec;
-            fs::remove_all(lib, ec);
+            uintmax_t filesRemoved = fs::remove_all(lib, ec);
             if (ec)
             {
-                std::cout << ec.message() << std::endl;
+                std::cout << lib.string() <<  " " << ec.message() << std::endl;
+                
             }
             else
             {
-                std::cout << lib.string() << " was deleted\n";
+                std::cout << lib.string() << " was deleted\n" << "Deleted: " <<  filesRemoved << " files, freed " << shortSize(path[i].size) << std::endl;
+                path[i].size = 0;
             }
         }
     }
